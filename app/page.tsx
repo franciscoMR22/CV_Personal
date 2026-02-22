@@ -171,7 +171,7 @@ export default function FranciscoPortfolioV5() {
             <div className={`space-y-8 transition-all ${showFinal ? 'blur-in' : 'opacity-0'}`}>
               <p className="text-2xl font-bold text-primary italic">Gestor de proyectos y Consultor</p>
               <p className="text-xl opacity-60 max-w-lg leading-relaxed font-light">
-                Soy **Francisco Mireles**, egresado de UPIICSA y especializado en arquitectura de sistemas.
+                Soy Francisco Mireles, egresado de UPIICSA y especializado en arquitectura de sistemas.
               </p>
               <button className="cta mt-4" onClick={() => window.open('https://wa.me/5560134264')}>
                 <span className="font-bold">Contactar</span>
