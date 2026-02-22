@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
 
-// Configuración de fuentes automáticas de Google
 const geistSans = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
@@ -27,12 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased selection:bg-primary/20 selection:text-primary`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem
-          disableTransitionOnChange
+          /* Se eliminó disableTransitionOnChange para permitir que el CSS global maneje el fade de 0.5s */
         >
           {children}
         </ThemeProvider>
