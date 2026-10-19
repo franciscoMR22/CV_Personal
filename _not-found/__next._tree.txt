@@ -1,3 +1,5 @@
-:HL["/CV_Personal/_next/static/chunks/3da47e22e62baf3d.css","style"]
-:HL["/CV_Personal/_next/static/chunks/b9b5e4b186a66593.css","style"]
-0:{"buildId":"oNFTS2oAxu9JtV2TOYDKd","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"/_not-found","paramType":null,"paramKey":"/_not-found","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+:HL["/CV_Personal/_next/static/chunks/3j3rm0edoo4h8.css","style"]
+:HL["/CV_Personal/_next/static/chunks/3co8404bzq-_y.css","style"]
+2:[["children",{"s":"__PAGE__","h":160}]]
+1:[["children",{"s":"/_not-found","h":96,"c":"$Q2"}]]
+0:{"b":"NOy-edFsDtlEBQS8rtQhH","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
