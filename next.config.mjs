@@ -11,6 +11,8 @@ const nextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
+  // Quita el indicador flotante de `next dev` (la "N" de la esquina inferior izquierda); no existe en producción
+  devIndicators: false,
 }
 
 export default nextConfig
