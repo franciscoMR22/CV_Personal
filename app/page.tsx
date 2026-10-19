@@ -17,6 +17,8 @@ import { certificatesData, projectsData } from '@/app/data/portfolio-data'
 import { IsometricArchitecture } from '@/components/isometric-architecture'
 import { CertificateCard } from '@/components/certificate-card'
 import { PdfModal } from '@/components/pdf-modal'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { LayerInfoPanel } from '@/components/layer-info-panel'
 import { useAvatarParticles } from '@/hooks/use-avatar-particles'
 import { Timeline } from '@/components/time-line/timeline'
 import { withBase } from '@/lib/base-path'
@@ -46,7 +48,23 @@ export default function FranciscoPortfolioV6() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedProject, setSelectedProject] = useState<any>(null)
   const [selectedCert, setSelectedCert] = useState<any>(null)
+  const [selectedLayer, setSelectedLayer] = useState<number | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
   const modalOpen = !!selectedProject || !!selectedCert
+
+  useEffect(() => {
+    if (!selectedProject) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      // Esc cierra primero la información de la capa y luego el modal
+      if (selectedLayer !== null) { setSelectedLayer(null); setPanelOpen(false) }
+      else setSelectedProject(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selectedProject, selectedLayer])
+
+  const closeProject = useCallback(() => { setSelectedProject(null); setSelectedLayer(null); setPanelOpen(false) }, [])
   const [activeSlide, setActiveSlide] = useState(0)
   const [direction, setDirection] = useState(0)
   const [isSliding, setIsSliding] = useState(false)
@@ -184,10 +202,7 @@ export default function FranciscoPortfolioV6() {
               <a href="https://wa.me/5560134264" target="_blank" className="opacity-60 hover:opacity-100"><MessageCircle size={20}/></a>
               <a href="https://www.instagram.com/francisco_mir_rod/" target="_blank" className="opacity-60 hover:opacity-100"><Instagram size={20}/></a>
               <a href="https://x.com/FranciscoMirRod" target="_blank" className="opacity-60 hover:opacity-100"><Twitter size={20}/></a>
-              <label className="ui-switch scale-75 ml-2">
-                <input type="checkbox" checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
-                <div className="slider"><div className="circle"></div></div>
-              </label>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -257,7 +272,7 @@ export default function FranciscoPortfolioV6() {
             )}
 
             {activeSlide === 2 && (
-              <section className="min-h-screen w-full flex items-center">
+              <section className="min-h-screen w-full flex items-center py-28">
                 <div className="max-w-7xl mx-auto px-6 w-full space-y-12">
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
                     <h2 className="text-4xl uppercase tracking-tighter font-bold">Certificaciones</h2>
@@ -281,7 +296,7 @@ export default function FranciscoPortfolioV6() {
                   <h2 className="text-4xl uppercase tracking-tighter text-center font-bold">Proyectos Destacados</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
                     {projectsData.map((proj) => (
-                      <div key={proj.id} onClick={() => setSelectedProject(proj)} className={`group cursor-pointer relative bg-glass backdrop-blur-xl border border-glass-border rounded-[32px] p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:scale-[1.02] ${proj.featured ? 'md:col-span-2' : ''}`}>
+                      <div key={proj.id} onClick={() => { setSelectedProject(proj); setSelectedLayer(null); setPanelOpen(true) }} className={`group cursor-pointer relative bg-glass backdrop-blur-xl border border-glass-border rounded-[32px] p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:scale-[1.02] ${proj.featured ? 'md:col-span-2' : ''}`}>
                         <div className="relative z-10">
                           <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{proj.category}</p>
                           <h3 className={`font-bold leading-tight mb-4 ${proj.featured ? 'text-3xl' : 'text-2xl'}`}>{proj.title}</h3>
@@ -313,21 +328,47 @@ export default function FranciscoPortfolioV6() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[2000] flex items-center justify-center p-6"
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 md:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label={selectedProject.title}
           >
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => setSelectedProject(null)} />
-            <div className="relative w-full max-w-5xl h-[85vh] flex flex-col items-center justify-center">
-              <button onClick={() => setSelectedProject(null)} className="absolute top-0 right-0 p-8 text-white/50 hover:text-primary transition-colors"><X size={48}/></button>
+            <div className="absolute inset-0 bg-black/35 backdrop-blur-sm" onClick={closeProject} />
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="relative w-full max-w-4xl max-h-full overflow-y-auto rounded-3xl border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl px-4 py-8 md:px-10"
+              style={{ scrollbarWidth: 'none' }}
+            >
+              <button onClick={closeProject} className="absolute top-4 right-4 z-10 p-2 rounded-full text-white/60 hover:text-white transition-colors" aria-label="Cerrar"><X size={24}/></button>
               <div className="text-center mb-10">
-                <Badge variant="outline" className="text-primary border-primary mb-6 py-1 px-4 font-bold">{selectedProject.category}</Badge>
-                <h2 className="text-6xl font-bold tracking-tight text-white mb-6 uppercase">{selectedProject.title}</h2>
-                <p className="text-xl text-white/60 max-w-2xl mx-auto font-normal">{selectedProject.description}</p>
+                <Badge variant="outline" className="mb-5 py-1 px-4 font-bold" style={{ color: selectedProject.accent, borderColor: selectedProject.accent }}>{selectedProject.category}</Badge>
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 uppercase">{selectedProject.title}</h2>
+                <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto font-normal">{selectedProject.description}</p>
               </div>
-              <div className="mt-4"><IsometricArchitecture layers={selectedProject.layers} isExpanded={true} /></div>
-            </div>
+              <IsometricArchitecture
+                key={selectedProject.id}
+                layers={selectedProject.layers}
+                accent={selectedProject.accent}
+                selected={selectedLayer}
+                onSelect={(idx) => { setSelectedLayer(idx); setPanelOpen(true) }}
+              />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LayerInfoPanel
+        open={!!selectedProject && panelOpen}
+        layer={selectedProject && selectedLayer !== null ? selectedProject.layers[selectedLayer] : null}
+        index={selectedLayer ?? 0}
+        total={selectedProject?.layers.length ?? 0}
+        accent={selectedProject?.accent ?? '#10B981'}
+        onClose={() => { setSelectedLayer(null); setPanelOpen(false) }}
+      />
     </div>
   )
 }
