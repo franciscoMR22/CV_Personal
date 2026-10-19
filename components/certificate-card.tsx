@@ -12,7 +12,7 @@
 import React, { useRef, useState } from 'react'
 
 //*Inicio************************Efecto de tarjeta Certificaciones************************
-export const CertificateCard = ({ cert }: { cert: any }) => {
+export const CertificateCard = ({ cert, onOpen }: { cert: any, onOpen: (cert: any) => void }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(false);
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -33,7 +33,7 @@ export const CertificateCard = ({ cert }: { cert: any }) => {
     }
   };
   return (
-    <div className="cert-wrap p-2" onMouseMove={handleMouseMove} onMouseEnter={() => setIsActive(true)} onMouseLeave={handleMouseLeave} onClick={() => window.open(`/docs/${cert.file}`, '_blank')}>
+    <div className="cert-wrap p-2" onMouseMove={handleMouseMove} onMouseEnter={() => setIsActive(true)} onMouseLeave={handleMouseLeave} onClick={() => onOpen(cert)}>
       <div ref={containerRef} className={`cert-container ${isActive ? 'active' : ''}`}>
         <h3>{cert.name}</h3><p>{cert.date}</p>
       </div>
