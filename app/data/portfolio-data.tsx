@@ -5,7 +5,7 @@
     Created by: Francisco Mireles Rodriguez
 
 */
-import { Code2, Terminal, Database, Server, Cpu, Briefcase, Smartphone, Network, Container, Globe, ShieldCheck, HardDrive } from 'lucide-react'
+import { Code2, Terminal, Database, Server, Cpu, Briefcase, Smartphone, Network, Container, Globe, ShieldCheck, HardDrive, LayoutDashboard, Activity, Library, Rocket } from 'lucide-react'
 
 //*Inicio************************Arreglo de experiencia (Roadmap)************************
 export const experienceData = [
@@ -107,6 +107,9 @@ export const getCertCategory = (name: string) => {
 }
 
 //*Inicio************************Arreglo de proyectos y caracteristicas************************
+// Miniatura (primera página del PDF) de cada certificado: /docs/X.pdf -> /thumbs/X.jpg
+export const certThumb = (file: string) => file.replace(/^\/docs\//, '/thumbs/').replace(/\.pdf$/i, '.jpg')
+
 export const projectsData = [
   { id: 1,
     title: "OMS Corporativo",
@@ -159,5 +162,32 @@ export const projectsData = [
       { label: "Hardware y respaldos", detail: "Volúmenes LVM y disco externo Seagate con rsync + cron", icon: <HardDrive />,
         info: { stack: "Intel Pentium N3700 · 4 GB RAM · SSD 480 GB · HDD 500 GB",
           summary: "Equipo modesto aprovechado con almacenamiento segmentado y respaldos automáticos.",
-          points: ["LVM en el SSD: 110 GB para el sistema, tres volúmenes de 40 GB para los sistemas de desarrollo y unos 220 GB libres para crecer.", "Respaldo diario a las 03:00 con rsync hacia el disco Seagate, con un RPO de 24 horas.", "Backups y datos fríos van al HDD para reducir el desgaste del SSD."] } } ] }
+          points: ["LVM en el SSD: 110 GB para el sistema, tres volúmenes de 40 GB para los sistemas de desarrollo y unos 220 GB libres para crecer.", "Respaldo diario a las 03:00 con rsync hacia el disco Seagate, con un RPO de 24 horas.", "Backups y datos fríos van al HDD para reducir el desgaste del SSD."] } } ] },
+  { id: 3,
+    title: "NetStack OSI × TCP/IP",
+    category: "Redes & Educación",
+    description: "Comparación interactiva entre el modelo OSI y TCP/IP, con simulador de encapsulamiento, catálogo de más de 100 protocolos y modo práctica.",
+    metrics: { left: "Catálogo: +100 protocolos", right: "Estado: en línea" }, featured: false, accent: "#D08A4E",
+    links: { live: "https://franciscomr22.github.io/ModeloOSI_TCP/", repo: "https://github.com/franciscoMR22/ModeloOSI_TCP" },
+    layers: [
+      { label: "Interfaz", detail: "Next.js · React · Tailwind · Motion", icon: <LayoutDashboard />,
+        info: { stack: "Next.js 16 · React 19 · Tailwind CSS 4 · shadcn/ui · Motion",
+          summary: "Sitio de una sola página que muestra una sección a la vez: capas, trazado, flujos, excepciones y práctica.",
+          points: ["Español e inglés y modo básico o técnico, sin librería de i18n: cada texto lleva sus dos versiones.", "Tema claro y oscuro con superficies de vidrio y un resplandor que sigue al cursor.", "Guía rápida integrada que recorre la interfaz paso a paso."] } },
+      { label: "Simulación", detail: "Encapsulamiento HTTP/2 + TLS 1.3 y handshakes con RTT", icon: <Activity />,
+        info: { stack: "HTTP/2 · TLS 1.3 · TCP · IPv4 · Ethernet",
+          summary: "Modela una petición HTTP/2 cifrada con TLS 1.3 y la encapsula capa por capa con tamaños reales de cabecera.",
+          points: ["Calcula MSS, número de segmentos y relleno, y muestra cada cabecera byte a byte en un inspector de bits.", "Diagramas de secuencia de handshakes reales: TCP de 3 vías, TLS 1.3, HTTP/3 sobre QUIC y QUIC 0-RTT, con comparación de latencia en RTT.", "Recorrido de lo que ocurre desde que se escribe una URL hasta que se renderiza la página."] } },
+      { label: "Catálogo de protocolos", detail: "Más de 100 protocolos con referencia a su RFC", icon: <Library />,
+        info: { stack: "+100 fichas · búsqueda con Ctrl+K · RFC y estándares",
+          summary: "Cada protocolo se define una sola vez, en el archivo de su capa principal, y las tarjetas de ambos modelos se llenan a partir de ahí.",
+          points: ["Fichas con resumen, detalle técnico, seguridad y buenas prácticas, y referencia al RFC o estándar vigente.", "Se carga bajo demanda con import dinámico para no inflar el bundle inicial.", "Los protocolos multicapa, como ARP, TLS, BGP, MPLS y QUIC, llevan una nota que explica por qué no encajan en una sola capa."] } },
+      { label: "Modelo de datos", detail: "OSI y TCP/IP con su mapeo y cabeceras campo por campo", icon: <Database />,
+        info: { stack: "OSI (7 capas) · TCP/IP (4 capas) · TypeScript",
+          summary: "Datos tipados de las capas, la correspondencia entre modelos y la anatomía de cada cabecera.",
+          points: ["La correspondencia OSI ↔ TCP/IP se dibuja con conectores SVG que se recalculan al cambiar el tamaño de las tarjetas.", "Cabeceras de Ethernet II, IPv4, IPv6, TCP, UDP, TLS 1.3 y HTTP/2 con ancho en bits y explicación básica y técnica.", "Contenido verificado contra RFC 1122/1123, RFC 9113 y la ISO/IEC 7498-1."] } },
+      { label: "Despliegue", detail: "Exportación estática en GitHub Pages con Actions", icon: <Rocket />,
+        info: { stack: "GitHub Pages · GitHub Actions · exportación estática",
+          summary: "Sitio estático publicado de forma automática.",
+          points: ["Cada push a main reconstruye y republica el sitio.", "En desarrollo se sirve en la raíz; el basePath solo se activa dentro del workflow de despliegue."] } } ] }
 ];

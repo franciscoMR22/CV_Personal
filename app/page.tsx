@@ -10,17 +10,17 @@ import Script from 'next/script'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { 
-  Github, Linkedin, Instagram, MessageCircle, Twitter, Cpu, Search, ChevronLeft, ChevronRight, X, ChevronUp, ChevronDown
+  Github, Linkedin, Instagram, MessageCircle, Twitter, Cpu, Search, ChevronLeft, ChevronRight, X, ChevronUp, ChevronDown, ExternalLink
 } from 'lucide-react'
 
 import { certificatesData, projectsData } from '@/app/data/portfolio-data'
 import { IsometricArchitecture } from '@/components/isometric-architecture'
-import { CertificateCard } from '@/components/certificate-card'
 import { PdfModal } from '@/components/pdf-modal'
+import { GradientCarousel } from '@/components/gradient-carousel'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LayerInfoPanel } from '@/components/layer-info-panel'
 import { useAvatarParticles } from '@/hooks/use-avatar-particles'
-import { Timeline } from '@/components/time-line/timeline'
+import { ExperienceDeck } from '@/components/experience-deck'
 import { withBase } from '@/lib/base-path'
 
 declare global { interface Window { particlesJS: any; } }
@@ -180,32 +180,42 @@ export default function FranciscoPortfolioV6() {
       
       <canvas ref={canvasRef} className={`avatar-canvas fixed top-0 left-0 w-full h-full pointer-events-none z-[40] transition-opacity duration-1500 ${isAssembled ? 'opacity-0' : 'opacity-100'}`} />
 
-      <nav className={`nav ${activeSlide > 0 ? 'affix' : ''}`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between relative">
-          <div className="logo"><a href="#" onClick={() => goToSlide(0)} className="text-2xl font-bold tracking-tighter">FMR.</a></div>
-          <div className="hidden lg:flex items-center gap-8">
-            <ul className="flex items-center gap-8">
-               {['Inicio', 'Experiencia', 'Certificados', 'Proyectos'].map((item, idx) => (
-                 <li key={item}>
-                   <button 
-                    onClick={() => goToSlide(idx)} 
-                    className={`uppercase text-xs tracking-widest transition-all ${activeSlide === idx ? 'nav-link-active' : 'opacity-70 hover:opacity-100'}`}
-                   >
-                     {item}
-                   </button>
-                 </li>
-               ))}
+      <nav className="nav">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className={`nav-pill ${activeSlide > 0 ? 'is-scrolled' : ''}`}
+        >
+          <a href="#" onClick={(e) => { e.preventDefault(); goToSlide(0) }} className="nav-logo text-xl font-bold tracking-tighter">FMR.</a>
+          <div className="hidden lg:flex items-center gap-3">
+            <ul className="flex items-center gap-1">
+              {['Inicio', 'Experiencia', 'Certificados', 'Proyectos'].map((item, idx) => (
+                <li key={item}>
+                  <button
+                    onClick={() => goToSlide(idx)}
+                    className={`nav-item ${activeSlide === idx ? 'is-active' : ''}`}
+                    aria-current={activeSlide === idx ? 'page' : undefined}
+                  >
+                    {activeSlide === idx && (
+                      <motion.span layoutId="nav-active" className="nav-active-bg" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />
+                    )}
+                    <span className="relative">{item}</span>
+                  </button>
+                </li>
+              ))}
             </ul>
-            <div className="flex gap-4 items-center ml-4 border-l border-glass-border pl-8">
-              <a href="https://github.com/franciscoMR22" target="_blank" className="opacity-60 hover:opacity-100"><Github size={20}/></a>
-              <a href="https://www.linkedin.com/in/mireles-rodriguez-francisco-47475b272/" target="_blank" className="opacity-60 hover:opacity-100"><Linkedin size={20}/></a>
-              <a href="https://wa.me/5560134264" target="_blank" className="opacity-60 hover:opacity-100"><MessageCircle size={20}/></a>
-              <a href="https://www.instagram.com/francisco_mir_rod/" target="_blank" className="opacity-60 hover:opacity-100"><Instagram size={20}/></a>
-              <a href="https://x.com/FranciscoMirRod" target="_blank" className="opacity-60 hover:opacity-100"><Twitter size={20}/></a>
-              <ThemeToggle />
+            <span className="nav-divider" />
+            <div className="flex items-center gap-1">
+              <a href="https://github.com/franciscoMR22" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="GitHub"><Github size={19}/></a>
+              <a href="https://www.linkedin.com/in/mireles-rodriguez-francisco-47475b272/" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="LinkedIn"><Linkedin size={19}/></a>
+              <a href="https://wa.me/5560134264" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="WhatsApp"><MessageCircle size={19}/></a>
+              <a href="https://www.instagram.com/francisco_mir_rod/" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="Instagram"><Instagram size={19}/></a>
+              <a href="https://x.com/FranciscoMirRod" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="X"><Twitter size={19}/></a>
+              <span className="ml-2"><ThemeToggle /></span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </nav>
 
       <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-[100] flex flex-col gap-4">
@@ -226,18 +236,18 @@ export default function FranciscoPortfolioV6() {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {activeSlide === 0 && (
-              <section className="min-h-screen w-full flex items-center">
+              <section className="min-h-screen w-full flex items-center pt-28 pb-16">
                 <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                  <div className="space-y-10">
-                    <div className={`space-y-4 transition-all duration-1000 ${showFinal ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                      <p className="text-xl text-primary tracking-tighter font-bold uppercase">Gestor de proyectos y líder técnico</p>
-                      <h1 className="text-6xl md:text-8xl tracking-tight leading-[0.9] font-bold">
+                  <div className="space-y-8">
+                    <div className={`space-y-5 transition-all duration-1000 ${showFinal ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                      <p className="text-sm text-primary-text tracking-[0.22em] font-semibold uppercase">Gestor de proyectos y líder técnico</p>
+                      <h1 className="text-[clamp(2.75rem,4.7vw,4.5rem)] tracking-tight leading-[1.05] font-bold text-balance">
                         Soluciones de TI<br />
                         <span className="text-primary font-normal">con visión estratégica.</span>
                       </h1>
                     </div>
-                    <div className={`space-y-8 transition-all duration-1000 delay-500 ${showFinal ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                      <p className="text-xl opacity-60 max-w-lg leading-relaxed font-normal">Graduado de UPIICSA IPN. Especialista en gestión de proyectos y gobernanza de TI, enfocado en optimizar procesos mediante arquitecturas robustas.</p>
+                    <div className={`space-y-10 transition-all duration-1000 delay-500 ${showFinal ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                      <p className="text-lg md:text-xl opacity-70 max-w-lg leading-[1.7] font-normal">Graduado de UPIICSA IPN. Especialista en gestión de proyectos y gobernanza de TI, enfocado en optimizar procesos mediante arquitecturas robustas.</p>
                       <button onClick={() => window.open('https://wa.me/5560134264')} className="animated-button">
                         <svg viewBox="0 0 24 24" className="arr-2" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
                         <span className="text">Contactar</span><span className="circle"></span>
@@ -255,51 +265,35 @@ export default function FranciscoPortfolioV6() {
             )}
 
             {activeSlide === 1 && (
-              <section className="min-h-screen w-full">
-                <div className="split-experience-layout h-screen">
-                  <div className="experience-left-static">
-                    <h2 className="text-7xl font-bold uppercase leading-[0.8] tracking-tighter">
-                      Trayectoria<br />
-                      <span className="text-primary font-normal">Profesional</span>
-                    </h2>
-                    <p className="mt-8 opacity-40 uppercase tracking-[0.4em] text-xs font-bold">Hitos y Experiencia Laboral</p>
-                  </div>
-                  <div className="experience-right-scroll">
-                    <Timeline />
-                  </div>
-                </div>
+              <section className="h-full w-full">
+                <ExperienceDeck />
               </section>
             )}
 
             {activeSlide === 2 && (
               <section className="min-h-screen w-full flex items-center py-28">
-                <div className="max-w-7xl mx-auto px-6 w-full space-y-12">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-                    <h2 className="text-4xl uppercase tracking-tighter font-bold">Certificaciones</h2>
+                <div className="w-full space-y-10">
+                  <div className="px-6 flex justify-center">
                     <div className="relative w-full max-w-sm">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
-                      <input type="text" placeholder="Buscar..." className="search-input pl-12 font-normal" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                      <input type="text" placeholder="Buscar..." aria-label="Buscar certificados" className="search-input font-normal" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {filteredCertificates.map((cert, i) => (
-                      <CertificateCard key={i} cert={cert} onOpen={setSelectedCert} />
-                    ))}
-                  </div>
+                  <GradientCarousel key={searchTerm} items={filteredCertificates} onOpen={setSelectedCert} />
                 </div>
               </section>
             )}
 
             {activeSlide === 3 && (
-              <section className="min-h-screen w-full flex items-center">
+              <section className="min-h-screen w-full flex items-center py-28">
                 <div className="max-w-7xl mx-auto px-6 w-full space-y-12">
                   <h2 className="text-4xl uppercase tracking-tighter text-center font-bold">Proyectos Destacados</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
                     {projectsData.map((proj) => (
-                      <div key={proj.id} onClick={() => { setSelectedProject(proj); setSelectedLayer(null); setPanelOpen(true) }} className={`group cursor-pointer relative bg-glass backdrop-blur-xl border border-glass-border rounded-[32px] p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:scale-[1.02] ${proj.featured ? 'md:col-span-2' : ''}`}>
+                      <div key={proj.id} onClick={() => { setSelectedProject(proj); setSelectedLayer(null); setPanelOpen(true) }} className={`group cursor-pointer relative bg-glass backdrop-blur-xl border border-glass-border rounded-[32px] p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:scale-[1.02]`}>
                         <div className="relative z-10">
                           <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{proj.category}</p>
-                          <h3 className={`font-bold leading-tight mb-4 ${proj.featured ? 'text-3xl' : 'text-2xl'}`}>{proj.title}</h3>
+                          <h3 className="font-bold leading-tight mb-4 text-2xl">{proj.title}</h3>
                           <p className="opacity-70 text-sm max-w-md leading-relaxed font-normal">{proj.description}</p>
                         </div>
                         <div className="mt-8 flex items-end justify-between relative z-10">
@@ -348,6 +342,20 @@ export default function FranciscoPortfolioV6() {
                 <Badge variant="outline" className="mb-5 py-1 px-4 font-bold" style={{ color: selectedProject.accent, borderColor: selectedProject.accent }}>{selectedProject.category}</Badge>
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 uppercase">{selectedProject.title}</h2>
                 <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto font-normal">{selectedProject.description}</p>
+                {selectedProject.links && (
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    {selectedProject.links.live && (
+                      <a href={selectedProject.links.live} target="_blank" rel="noopener noreferrer" className="project-link" style={{ '--accent': selectedProject.accent } as React.CSSProperties}>
+                        Ver sitio en vivo <ExternalLink size={14} />
+                      </a>
+                    )}
+                    {selectedProject.links.repo && (
+                      <a href={selectedProject.links.repo} target="_blank" rel="noopener noreferrer" className="project-link" style={{ '--accent': selectedProject.accent } as React.CSSProperties}>
+                        <Github size={14} /> Repositorio
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
               <IsometricArchitecture
                 key={selectedProject.id}
