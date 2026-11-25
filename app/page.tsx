@@ -1,233 +1,374 @@
+/* Revisión ID: CV06032026005-SLIDES-FIXED2
+   Created by: Francisco Mireles Rodriguez 
+   Update: Fondo transparente en contenedor principal para ver partículas */
+
 'use client'
 
-import * as React from 'react'
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useTheme } from 'next-themes'
+import Script from 'next/script'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { 
-  Briefcase, 
-  Award, 
-  MapPin, 
-  Mail, 
-  Terminal,
-  Layers,
-  BookOpen,
-  Code2,
-  ChevronRight
+  Github, Linkedin, Instagram, MessageCircle, Twitter, Search, ChevronLeft, ChevronRight, X, ChevronUp, ChevronDown, ExternalLink
 } from 'lucide-react'
 
-// Componente para iconos sociales (Horizontal)
-const SocialIcon = ({ href, containerClass, iconPath, viewBox = "0 0 16 16" }: { href: string, containerClass: string, iconPath: React.ReactNode, viewBox?: string }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className={`socialContainer ${containerClass}`}>
-    <svg className="socialSvg" viewBox={viewBox}>{iconPath}</svg>
-  </a>
-)
+import { certificatesData, projectsData } from '@/app/data/portfolio-data'
+import { IsometricArchitecture } from '@/components/isometric-architecture'
+import { PdfModal } from '@/components/pdf-modal'
+import { GradientCarousel } from '@/components/gradient-carousel'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { LayerInfoPanel } from '@/components/layer-info-panel'
+import { useAvatarParticles } from '@/hooks/use-avatar-particles'
+import { ExperienceDeck } from '@/components/experience-deck'
+import { ProjectCard } from '@/components/project-card'
+import { withBase } from '@/lib/base-path'
 
-// Tarjeta para Proyectos/Artículos (Mismo estilo que certificaciones)
-const FeatureCard = ({ title, desc, tag, linkText }: { title: string, desc: string, tag: string, linkText: string }) => (
-  <div className="cert-card">
-    <div className="cert-content">
-      <Badge className="w-fit mb-3 bg-primary/10 text-primary border-primary/20">{tag}</Badge>
-      <p className="text-xl font-bold leading-tight mb-2">{title}</p>
-      <p className="text-sm opacity-80 mb-6 leading-relaxed">{desc}</p>
-      <button className="uiverse-btn">
-        <span className="button_top flex items-center gap-2">
-          {linkText} <ChevronRight className="h-4 w-4" />
-        </span>
-      </button>
-    </div>
-  </div>
-)
+declare global { interface Window { particlesJS: any; } }
 
-// Componente de Tarjeta de Certificación original
-const CertificationCard = ({ title, issuer, pdfUrl }: { title: string, issuer: string, pdfUrl: string }) => (
-  <div className="cert-card">
-    <div className="cert-content">
-      <p className="text-xl font-bold leading-tight mb-2">{title}</p>
-      <p className="text-sm opacity-80 mb-6">{issuer}</p>
-      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="uiverse-btn">
-        <span className="button_top">Ver Certificado</span>
-      </a>
-    </div>
-  </div>
-)
+const slideVariants: any = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    transition: { duration: 0.6, ease: [0.19, 1, 0.22, 1] },
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? '100%' : '-100%',
+    opacity: 0,
+    transition: { duration: 0.5, ease: [0.19, 1, 0.22, 1] },
+  }),
+}
 
-export default function PortfolioDashboard() {
+export default function FranciscoPortfolioV6() {
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedProject, setSelectedProject] = useState<any>(null)
+  const [selectedCert, setSelectedCert] = useState<any>(null)
+  const [selectedLayer, setSelectedLayer] = useState<number | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const modalOpen = !!selectedProject || !!selectedCert
 
-  React.useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    if (!selectedProject) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      // Esc cierra primero la información de la capa y luego el modal
+      if (selectedLayer !== null) { setSelectedLayer(null); setPanelOpen(false) }
+      else setSelectedProject(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selectedProject, selectedLayer])
 
-  const profile = {
-    name: 'Francisco Mireles Rodríguez',
-    title: 'Project Manager & Líder Técnico',
-    about: 'Especialista en Ciencias de la Informática por el IPN enfocado en la optimización del SDLC y seguridad de la información. Mi gestión alinea la infraestructura tecnológica con los objetivos de negocio mediante marcos de gobernanza robustos.',
-    status: 'Disponible para proyectos',
-    image: '/foto.png',
-    email: 'contacto@franciscomireles.com',
-    location: 'Ciudad de México, México'
+  const closeProject = useCallback(() => { setSelectedProject(null); setSelectedLayer(null); setPanelOpen(false) }, [])
+  const openProject = (proj: any) => { setSelectedProject(proj); setSelectedLayer(null); setPanelOpen(true) }
+  const [activeSlide, setActiveSlide] = useState(0)
+  const [direction, setDirection] = useState(0)
+  const [isSliding, setIsSliding] = useState(false)
+  const scrollThreshold = 80
+  const deltaRef = useRef(0)
+  const lastWheelRef = useRef(0)
+
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const { isAssembled, showFinal } = useAvatarParticles({
+    canvasRef,
+    containerRef,
+    imagePath: withBase('/avatar.png'),
+    mounted,
+    offsetX: -12,   // ← mismo valor que en la clase de la imagen
+    offsetY: 0,
+  })
+
+  const lightParticles = useMemo(() => {
+    return [...Array(300)].map(() => {
+      const theta = 2 * Math.PI * Math.random(); const u = Math.random() + Math.random();
+      const r = u > 1 ? 2 - u : u; const x = r * Math.cos(theta) * 150; const y = r * Math.sin(theta) * 150;
+      const c = Math.sqrt(Math.pow(r * Math.cos(theta), 2) + Math.pow(r * Math.sin(theta), 2));
+      const d = Math.sin(c * Math.PI / 2); const baseHue = 60; const hueShift = -160;
+      return { background: `hsla(${baseHue + d * hueShift}, 100%, ${80 - 30 * d}%, 1)`, transform: `translate3d(${x}vmin, ${y}vmin, 0) scale(${1 - d})`, animationDelay: `${-2.1 * Math.random() * 18000}ms` };
+    });
+  }, []);
+
+  const initParticles = () => {
+    if (window.particlesJS) {
+      window.particlesJS("particles-js", {
+        "particles": { "number": { "value": 600, "density": { "enable": false } }, "color": { "value": "#ffebb6" }, "shape": { "type": "star" }, "opacity": { "value": 1, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0 } }, "size": { "value": 2, "random": true, "anim": { "enable": true, "speed": 16.67, "size_min": 0 } }, "line_linked": { "enable": false }, "move": { "enable": true, "speed": 2, "direction": "top-right", "random": true, "out_mode": "bounce" } },
+        "interactivity": { "detect_on": "canvas", "events": { "resize": true } }, "retina_detect": true
+      });
+    }
   }
 
-  const socialLinks = {
-    instagram: 'https://www.instagram.com/francisco_mir_rod/',
-    twitter: 'https://x.com/FranciscoMirRod',
-    linkedin: 'https://www.linkedin.com/in/mireles-rodriguez-francisco-47475b272/',
-    whatsapp: 'https://wa.me/5560134264',
-    github: 'https://github.com/franciscoMR22'
+  const goToSlide = useCallback((index: number) => {
+    if (isSliding) return
+    if (index < 0) index = 3
+    if (index > 3) index = 0
+    setDirection(index > activeSlide ? 1 : -1)
+    setActiveSlide(index)
+    setIsSliding(true)
+    setTimeout(() => setIsSliding(false), 800)
+  }, [activeSlide, isSliding])
+
+  const nextSlide = useCallback(() => goToSlide(activeSlide + 1), [activeSlide, goToSlide])
+  const prevSlide = useCallback(() => goToSlide(activeSlide - 1), [activeSlide, goToSlide])
+
+  // Un elemento interno con scroll propio (p. ej. la línea de tiempo) consume la rueda antes de cambiar de slide
+  const canScrollInside = (target: EventTarget | null, dir: number) => {
+    let el = target instanceof HTMLElement ? target : null
+    while (el && el !== document.body) {
+      const oy = getComputedStyle(el).overflowY
+      if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1) {
+        if (dir > 0 && el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true
+        if (dir < 0 && el.scrollTop > 0) return true
+      }
+      el = el.parentElement
+    }
+    return false
   }
 
-  // DATA NUEVA: Proyectos
-  const projects = [
-    { title: 'Microservicios: Repostería', desc: 'Arquitectura distribuida para la gestión de un negocio de postres, enfocada en escalabilidad.', tag: 'Backend' },
-    { title: 'Inventario Biblioteca', desc: 'Sistema con SDLC completo para el control de acervo bibliográfico técnico.', tag: 'Fullstack' },
-    { title: 'CV Dinámico Laravel', desc: 'Plataforma interactiva con Laravel e Inertia.js para marca personal.', tag: 'Laravel' }
-  ]
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (isSliding || modalOpen) return
+    const dir = Math.sign(e.deltaY)
+    if (dir === 0) return
+    const now = performance.now()
+    if (now - lastWheelRef.current > 200 || Math.sign(deltaRef.current) !== dir) deltaRef.current = 0
+    lastWheelRef.current = now
+    if (canScrollInside(e.target, dir)) { deltaRef.current = 0; return }
+    deltaRef.current += e.deltaY * (e.deltaMode === 1 ? 16 : 1)
+    if (Math.abs(deltaRef.current) >= scrollThreshold) {
+      deltaRef.current = 0
+      dir > 0 ? nextSlide() : prevSlide()
+    }
+  }, [isSliding, modalOpen, nextSlide, prevSlide])
 
-  // DATA NUEVA: Artículos
-  const articles = [
-    { title: 'Optimización del SDLC', desc: 'Metodologías profesionales aplicadas a microempresas para asegurar calidad.', tag: 'Gobernanza' },
-    { title: 'Hardening Home Lab', desc: 'Aseguramiento de infraestructura basada en Ubuntu y hardware HP ProDesk.', tag: 'Seguridad' }
-  ]
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (isSliding || modalOpen) return
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault()
+      nextSlide()
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault()
+      prevSlide()
+    }
+  }, [isSliding, modalOpen, nextSlide, prevSlide])
 
-  // DATA NUEVA: Roadmap
-  const roadmap = [
-    { step: '01', title: 'Maestría en Finanzas', desc: 'Especialización económica para proyectos de ingeniería.', status: 'Planificación' },
-    { step: '02', title: 'Certificación Inglés C1', desc: 'Dominio avanzado para entornos bilingües.', status: 'En Proceso' },
-    { step: '03', title: 'Project Director', desc: 'Liderazgo estratégico de departamentos TI.', status: 'Objetivo 2027' }
-  ]
+  useEffect(() => {
+    setMounted(true)
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleWheel, handleKeyDown])
 
-  const experience = [
-    { title: 'Practicante TI', company: 'ARMUR Soluciones - Grupo FEMSA', dateRange: '2023 - 2025', type: 'timeline__event--type1', icon: Layers, achievements: ['Seguridad de accesos', 'Power Platform', 'Proyectos .NET'] },
-    { title: 'Becario TI', company: 'Grupo CISA', dateRange: '2022 - 2023', type: 'timeline__event--type2', icon: Terminal, achievements: ['Mantenimiento web', 'Azure y Office 365', 'Reingeniería'] }
-  ]
+  const filteredCertificates = certificatesData.filter(cert => cert.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
-          <div className="social-group">
-            <SocialIcon href={socialLinks.instagram} containerClass="containerOne" iconPath={<path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"></path>} />
-            <SocialIcon href={socialLinks.twitter} containerClass="containerTwo" iconPath={<path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"></path>} />
-            <SocialIcon href={socialLinks.linkedin} containerClass="containerThree" viewBox="0 0 448 512" iconPath={<path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"></path>} />
-            <SocialIcon href={socialLinks.whatsapp} containerClass="containerFour" iconPath={<path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"></path>} />
-            <SocialIcon href={socialLinks.github} containerClass="containerFive" iconPath={<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>} />
+    <div className="h-screen overflow-hidden bg-transparent"> {/* Fondo transparente */}
+      <Script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js" onLoad={initParticles} />
+      <div id="particles-js" className={theme === 'dark' ? 'opacity-100' : 'opacity-0'} />
+      <div className={`light-particles-container ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}>
+        {lightParticles.map((style, i) => (<div key={i} className="particle" style={style} />))}
+      </div>
+      
+      <canvas ref={canvasRef} className={`avatar-canvas fixed top-0 left-0 w-full h-full pointer-events-none z-[40] transition-opacity duration-1500 ${isAssembled ? 'opacity-0' : 'opacity-100'}`} />
+
+      <nav className="nav">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className={`nav-pill ${activeSlide > 0 ? 'is-scrolled' : ''}`}
+        >
+          <a href="#" onClick={(e) => { e.preventDefault(); goToSlide(0) }} className="nav-logo text-xl font-bold tracking-tighter">FMR.</a>
+          <div className="hidden lg:flex items-center gap-3">
+            <ul className="flex items-center gap-1">
+              {['Inicio', 'Experiencia', 'Certificados', 'Proyectos'].map((item, idx) => (
+                <li key={item}>
+                  <button
+                    onClick={() => goToSlide(idx)}
+                    className={`nav-item ${activeSlide === idx ? 'is-active' : ''}`}
+                    aria-current={activeSlide === idx ? 'page' : undefined}
+                  >
+                    {activeSlide === idx && (
+                      <motion.span layoutId="nav-active" className="nav-active-bg" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />
+                    )}
+                    <span className="relative">{item}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <span className="nav-divider" />
+            <div className="flex items-center gap-1">
+              <a href="https://github.com/franciscoMR22" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="GitHub"><Github size={19}/></a>
+              <a href="https://www.linkedin.com/in/mireles-rodriguez-francisco-47475b272/" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="LinkedIn"><Linkedin size={19}/></a>
+              <a href="https://wa.me/5560134264" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="WhatsApp"><MessageCircle size={19}/></a>
+              <a href="https://www.instagram.com/francisco_mir_rod/" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="Instagram"><Instagram size={19}/></a>
+              <a href="https://x.com/FranciscoMirRod" target="_blank" rel="noopener noreferrer" className="nav-icon" aria-label="X"><Twitter size={19}/></a>
+              <span className="ml-2"><ThemeToggle /></span>
+            </div>
           </div>
-          <div className="flex items-center">
-            <input type="checkbox" id="darkmode-toggle" className="input-toggle-dark hidden" checked={theme === 'dark'} onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
-            <label htmlFor="darkmode-toggle" className="darkmode-label">
-              <svg version="1.1" className="sun" viewBox="0 0 496 496"><path d="M248,88c-88.224,0-160,71.776-160,160s71.776,160,160,160s160-71.776,160-160S336.224,88,248,88z M248,392c-79.4,0-144-64.6-144-144s64.6-144,144-144s144,64.6,144,144S327.4,392,248,392z" /></svg>
-              <svg version="1.1" className="moon" viewBox="0 0 49.739 49.739"><path d="M25.068,48.889c-9.173,0-18.017-5.06-22.396-13.804C-3.373,23.008,1.164,8.467,13.003,1.979l2.061-1.129l-0.615,2.268c-1.479,5.459-0.899,11.25,1.633,16.306c2.75,5.493,7.476,9.587,13.305,11.526c5.831,1.939,12.065,1.492,17.559-1.258v0c0.25-0.125,0.492-0.258,0.734-0.391l2.061-1.13l-0.585,2.252c-1.863,6.873-6.577,12.639-12.933,15.822C32.639,48.039,28.825,48.888,25.068,48.889z" /></svg>
-            </label>
-          </div>
-        </div>
+        </motion.div>
       </nav>
 
-      <div className="lg:flex">
-        <aside className="bg-card lg:w-[400px] lg:fixed lg:h-[calc(100vh-4rem)] lg:border-r border-border/40 p-8 flex flex-col overflow-y-auto">
-          <div className="flex-1 space-y-8">
-            <div className="text-center lg:text-left space-y-4">
-              <div className="relative mx-auto lg:mx-0 w-44 h-44">
-                <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl animate-pulse"></div>
-                <div className="relative h-full w-full overflow-hidden rounded-full border-[6px] border-background shadow-xl">
-                  <img src={profile.image} alt={profile.name} className="h-full w-full object-cover" />
-                </div>
-                <Badge className="absolute bottom-2 right-2 bg-emerald-500 text-white border-2 border-background">{profile.status}</Badge>
-              </div>
-              <h1 className="text-3xl font-bold text-foreground leading-tight">{profile.name}</h1>
-              <p className="text-lg text-primary font-medium">{profile.title}</p>
-            </div>
-
-            <a href="/docs/Project Management Institute (PMI)®.pdf" target="_blank" rel="noopener noreferrer" className="uiverse-btn w-full">
-              <span className="button_top block w-full">Descargar CV en PDF</span>
-            </a>
-
-            {/* ROADMAP SECCIÓN */}
-            <div className="space-y-6">
-              <h2 className="text-xs font-bold text-secondary uppercase tracking-widest flex items-center gap-2">
-                <span className="w-4 h-[1.5px] bg-secondary"></span> Roadmap Profesional
-              </h2>
-              <div className="space-y-4">
-                {roadmap.map((item, i) => (
-                  <div key={i} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs border border-primary/30">
-                        {item.step}
-                      </div>
-                      {i !== roadmap.length - 1 && <div className="w-[1px] h-full bg-border mt-1"></div>}
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm leading-none mb-1">{item.title}</p>
-                      <p className="text-xs text-muted-foreground mb-1">{item.desc}</p>
-                      <Badge variant="outline" className="text-[10px] py-0">{item.status}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <main className="flex-1 lg:ml-[400px] p-8 md:p-12 lg:p-16">
-          <div className="max-w-4xl mx-auto space-y-20">
-            {/* TRAYECTORIA */}
-            <section>
-              <h3 className="text-3xl font-bold mb-10 flex items-center gap-3"><Briefcase className="text-primary h-8 w-8" /> Trayectoria</h3>
-              <div className="timeline">
-                {experience.map((exp, i) => (
-                  <div key={i} className={`timeline__event animated fadeInUp ${exp.type}`}>
-                    <div className="timeline__event__icon"><exp.icon className="h-8 w-8" /></div>
-                    <div className="timeline__event__date">{exp.dateRange}</div>
-                    <div className="timeline__event__content">
-                      <div className="timeline__event__title">{exp.title}</div>
-                      <div className="timeline__event__description text-muted-foreground mt-2 dark:text-gray-300">
-                        <p className="font-semibold mb-2">{exp.company}</p>
-                        <ul className="space-y-1 text-sm">{exp.achievements.map((a, j) => (<li key={j}>• {a}</li>))}</ul>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <Separator className="opacity-40" />
-
-            {/* SECCIÓN PROYECTOS */}
-            <section>
-              <h3 className="text-3xl font-bold mb-10 flex items-center gap-3"><Code2 className="text-primary h-8 w-8" /> Proyectos</h3>
-              <div className="grid gap-8 sm:grid-cols-2">
-                {projects.map((proj, i) => (
-                  <FeatureCard key={i} title={proj.title} desc={proj.desc} tag={proj.tag} linkText="Ver Detalles" />
-                ))}
-              </div>
-            </section>
-
-            <Separator className="opacity-40" />
-
-            {/* SECCIÓN ARTÍCULOS */}
-            <section>
-              <h3 className="text-3xl font-bold mb-10 flex items-center gap-3"><BookOpen className="text-primary h-8 w-8" /> Artículos</h3>
-              <div className="grid gap-8 sm:grid-cols-2">
-                {articles.map((art, i) => (
-                  <FeatureCard key={i} title={art.title} desc={art.desc} tag={art.tag} linkText="Leer Más" />
-                ))}
-              </div>
-            </section>
-
-            <Separator className="opacity-40" />
-
-            {/* CERTIFICACIONES */}
-            <section>
-              <h3 className="text-3xl font-bold mb-10 flex items-center gap-3"><Award className="text-primary h-8 w-8" /> Certificaciones</h3>
-              <div className="grid gap-8 sm:grid-cols-2">
-                <CertificationCard title="Gestión de Proyectos (PMI)®" issuer="LinkedIn Learning" pdfUrl="/docs/Project Management Institute (PMI)®.pdf" />
-                <CertificationCard title="Scrum Avanzado" issuer="PMI" pdfUrl="/docs/CertificadoDeFinalizacion_Scrum avanzado - PMI.pdf" />
-              </div>
-            </section>
-          </div>
-        </main>
+      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-[100] flex flex-col gap-4">
+        <button onClick={prevSlide} className="p-3 rounded-full bg-glass backdrop-blur-xl border border-glass-border text-foreground/70 hover:text-primary transition-colors disabled:opacity-30" disabled={isSliding} aria-label="Anterior"><ChevronUp size={24} /></button>
+        <button onClick={nextSlide} className="p-3 rounded-full bg-glass backdrop-blur-xl border border-glass-border text-foreground/70 hover:text-primary transition-colors disabled:opacity-30" disabled={isSliding} aria-label="Siguiente"><ChevronDown size={24} /></button>
       </div>
+
+      <div className="relative h-full w-full overflow-hidden">
+        <AnimatePresence initial={false} custom={direction} mode="wait">
+          <motion.div
+            key={activeSlide}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="absolute inset-0 w-full h-full overflow-y-auto"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {activeSlide === 0 && (
+              <section className="min-h-screen w-full flex items-center pt-28 pb-16">
+                <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                  <div className="space-y-8">
+                    <div className={`space-y-5 transition-all duration-1000 ${showFinal ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                      <p className="text-sm text-primary-text tracking-[0.22em] font-semibold uppercase">Gestor de proyectos y líder técnico</p>
+                      <h1 className="text-[clamp(2.75rem,4.7vw,4.5rem)] tracking-tight leading-[1.05] font-bold text-balance">
+                        Soluciones de TI<br />
+                        <span className="text-primary font-normal">con visión estratégica.</span>
+                      </h1>
+                    </div>
+                    <div className={`space-y-10 transition-all duration-1000 delay-500 ${showFinal ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                      <p className="text-lg md:text-xl opacity-70 max-w-lg leading-[1.7] font-normal">Graduado de UPIICSA IPN. Especialista en gestión de proyectos y gobernanza de TI, enfocado en optimizar procesos mediante arquitecturas robustas.</p>
+                      <button onClick={() => window.open('https://wa.me/5560134264')} className="animated-button">
+                        <svg viewBox="0 0 24 24" className="arr-2" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
+                        <span className="text">Contactar</span><span className="circle"></span>
+                        <svg viewBox="0 0 24 24" className="arr-1" xmlns="http://www.w3.org/2000/svg"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex justify-center lg:justify-end">
+                    <div ref={containerRef} className={`avatar-container w-full max-w-[450px] p-0 transition-all ${showFinal ? 'active-frame shadow-2xl' : ''}`}>
+                      <img src={withBase('/avatar.png')} alt="Francisco" className={`w-full h-auto block rounded-[36px] transition-all duration-1000 ease-out relative -left-[12px] ${isAssembled ? 'opacity-100 blur-0' : 'opacity-0 blur-2xl'}`} />
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {activeSlide === 1 && (
+              <section className="h-full w-full">
+                <ExperienceDeck />
+              </section>
+            )}
+
+            {activeSlide === 2 && (
+              <section className="min-h-screen w-full flex items-center py-28">
+                <div className="w-full space-y-10">
+                  <div className="px-6 flex justify-center">
+                    <div className="relative w-full max-w-sm">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={18} />
+                      <input type="text" placeholder="Buscar..." aria-label="Buscar certificados" className="search-input font-normal" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                    </div>
+                  </div>
+                  <GradientCarousel key={searchTerm} items={filteredCertificates} onOpen={setSelectedCert} />
+                </div>
+              </section>
+            )}
+
+            {activeSlide === 3 && (
+              <section className="min-h-screen w-full flex items-center py-28">
+                <div className="max-w-[90rem] mx-auto px-6 xl:px-20 w-full space-y-12">
+                  <h2 className="text-4xl uppercase tracking-tighter text-center font-bold">Proyectos Destacados</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))] gap-4 auto-rows-[minmax(220px,auto)]" style={{ '--cols': projectsData.length } as React.CSSProperties}>
+                    {projectsData.map((proj) => (
+                      <ProjectCard key={proj.id} project={proj} onOpen={() => openProject(proj)} />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <AnimatePresence>
+        {selectedCert && (
+          <PdfModal title={selectedCert.name} file={selectedCert.file} onClose={() => setSelectedCert(null)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 md:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label={selectedProject.title}
+          >
+            <div className="absolute inset-0 bg-black/35 backdrop-blur-sm" onClick={closeProject} />
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="relative w-full max-w-4xl max-h-full overflow-y-auto rounded-3xl border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl px-4 py-8 md:px-10"
+              style={{ scrollbarWidth: 'none' }}
+            >
+              <button onClick={closeProject} className="absolute top-4 right-4 z-10 p-2 rounded-full text-white/60 hover:text-white transition-colors" aria-label="Cerrar"><X size={24}/></button>
+              <div className="text-center mb-10">
+                <Badge variant="outline" className="mb-5 py-1 px-4 font-bold" style={{ color: selectedProject.accent, borderColor: selectedProject.accent }}>{selectedProject.category}</Badge>
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4 uppercase">{selectedProject.title}</h2>
+                <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto font-normal">{selectedProject.description}</p>
+                {selectedProject.links && (
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    {selectedProject.links.live && (
+                      <a href={selectedProject.links.live} target="_blank" rel="noopener noreferrer" className="project-link" style={{ '--accent': selectedProject.accent } as React.CSSProperties}>
+                        Ver sitio en vivo <ExternalLink size={14} />
+                      </a>
+                    )}
+                    {selectedProject.links.repo && (
+                      <a href={selectedProject.links.repo} target="_blank" rel="noopener noreferrer" className="project-link" style={{ '--accent': selectedProject.accent } as React.CSSProperties}>
+                        <Github size={14} /> Repositorio
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+              <IsometricArchitecture
+                key={selectedProject.id}
+                layers={selectedProject.layers}
+                accent={selectedProject.accent}
+                selected={selectedLayer}
+                onSelect={(idx) => { setSelectedLayer(idx); setPanelOpen(true) }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <LayerInfoPanel
+        open={!!selectedProject && panelOpen}
+        layer={selectedProject && selectedLayer !== null ? selectedProject.layers[selectedLayer] : null}
+        index={selectedLayer ?? 0}
+        total={selectedProject?.layers.length ?? 0}
+        accent={selectedProject?.accent ?? '#10B981'}
+        onClose={() => { setSelectedLayer(null); setPanelOpen(false) }}
+      />
     </div>
   )
 }

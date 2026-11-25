@@ -1,301 +1,72 @@
+# Francisco Mireles Rodríguez — CV digital
+
+Portafolio profesional de una sola página, enfocado en gestión de proyectos y gobernanza de TI.
+
+**Sitio en vivo:** https://franciscomr22.github.io/CV_Personal/
+
+## Qué incluye
+
+- **Inicio:** presentación con el avatar armado a partir de partículas y fondo animado que cambia con el tema.
+- **Experiencia:** recorrido con zoom, una escena por gesto de scroll. La experiencia laboral y la formación académica van en grupos separados, y cada puesto tiene un detalle desplegable con sus logros.
+- **Certificados:** carrusel 3D con 33 certificados. Cada tarjeta toma el color de su categoría y se abre en un visor de PDF dentro de la página. Incluye buscador.
+- **Proyectos:** OMS Corporativo, Home Lab Linux, NetStack (OSI × TCP/IP), Ajedrez 3D y un sistema institucional en Oracle APEX. Cada uno abre un diagrama isométrico de su arquitectura; al hacer clic en una capa se muestra su detalle.
+- **Navegación y tema:** barra flotante translúcida, tema claro y oscuro, y recorrido por teclado y rueda del ratón.
+
+## Tecnologías
+
+Next.js 16 (App Router, exportación estática) · React 19 · TypeScript · Tailwind CSS 4 · Framer Motion · componentes de Radix y shadcn/ui · lucide-react · next-themes.
+
+## Estructura
 
 ```
-CV
-├─ app
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  └─ page.tsx
-├─ components
-│  ├─ theme-provider.tsx
-│  └─ ui
-│     ├─ accordion.tsx
-│     ├─ alert-dialog.tsx
-│     ├─ alert.tsx
-│     ├─ aspect-ratio.tsx
-│     ├─ avatar.tsx
-│     ├─ badge.tsx
-│     ├─ breadcrumb.tsx
-│     ├─ button-group.tsx
-│     ├─ button.tsx
-│     ├─ calendar.tsx
-│     ├─ card.tsx
-│     ├─ carousel.tsx
-│     ├─ chart.tsx
-│     ├─ checkbox.tsx
-│     ├─ collapsible.tsx
-│     ├─ command.tsx
-│     ├─ context-menu.tsx
-│     ├─ dialog.tsx
-│     ├─ drawer.tsx
-│     ├─ dropdown-menu.tsx
-│     ├─ empty.tsx
-│     ├─ field.tsx
-│     ├─ form.tsx
-│     ├─ hover-card.tsx
-│     ├─ input-group.tsx
-│     ├─ input-otp.tsx
-│     ├─ input.tsx
-│     ├─ item.tsx
-│     ├─ kbd.tsx
-│     ├─ label.tsx
-│     ├─ menubar.tsx
-│     ├─ navigation-menu.tsx
-│     ├─ pagination.tsx
-│     ├─ popover.tsx
-│     ├─ progress.tsx
-│     ├─ radio-group.tsx
-│     ├─ resizable.tsx
-│     ├─ scroll-area.tsx
-│     ├─ select.tsx
-│     ├─ separator.tsx
-│     ├─ sheet.tsx
-│     ├─ sidebar.tsx
-│     ├─ skeleton.tsx
-│     ├─ slider.tsx
-│     ├─ sonner.tsx
-│     ├─ spinner.tsx
-│     ├─ switch.tsx
-│     ├─ table.tsx
-│     ├─ tabs.tsx
-│     ├─ textarea.tsx
-│     ├─ toast.tsx
-│     ├─ toaster.tsx
-│     ├─ toggle-group.tsx
-│     ├─ toggle.tsx
-│     ├─ tooltip.tsx
-│     ├─ use-mobile.tsx
-│     └─ use-toast.ts
-├─ components.json
-├─ hooks
-│  ├─ use-mobile.ts
-│  └─ use-toast.ts
-├─ lib
-│  └─ utils.ts
-├─ next.config.mjs
-├─ package.json
-├─ pnpm-lock.yaml
-├─ portfolio-dashboard.zip
-├─ postcss.config.mjs
-├─ public
-│  ├─ apple-icon.png
-│  ├─ icon-dark-32x32.png
-│  ├─ icon-light-32x32.png
-│  ├─ icon.svg
-│  ├─ placeholder-logo.png
-│  ├─ placeholder-logo.svg
-│  ├─ placeholder-user.jpg
-│  ├─ placeholder.jpg
-│  └─ placeholder.svg
-├─ styles
-│  └─ globals.css
-└─ tsconfig.json
+app/
+  data/portfolio-data.tsx   certificados y proyectos (con sus capas de arquitectura)
+  globals.css               tokens de tema y estilos de cada sección
+  icon.svg, apple-icon.png  ícono de la pestaña
+  layout.tsx, page.tsx      estructura general y secciones
+components/
+  gradient-carousel.tsx     carrusel de certificados
+  experience-deck.tsx       recorrido de experiencia y formación
+  isometric-architecture.tsx, layer-info-panel.tsx   arquitectura de proyectos
+  pdf-modal.tsx, theme-toggle.tsx
+  time-line/                datos de experiencia y efecto de borde
+  ui/                       componentes base de shadcn/ui
+hooks/                      partículas del avatar y utilidades
+lib/                        utilidades y ruta base del despliegue
+public/
+  avatar.png
+  docs/                     certificados en PDF
+  thumbs/                   miniatura de cada certificado
+```
 
-```
-```
-CV
-├─ app
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  └─ page.tsx
-├─ components
-│  ├─ theme-provider.tsx
-│  └─ ui
-│     ├─ accordion.tsx
-│     ├─ alert-dialog.tsx
-│     ├─ alert.tsx
-│     ├─ aspect-ratio.tsx
-│     ├─ avatar.tsx
-│     ├─ badge.tsx
-│     ├─ breadcrumb.tsx
-│     ├─ button-group.tsx
-│     ├─ button.tsx
-│     ├─ calendar.tsx
-│     ├─ card.tsx
-│     ├─ carousel.tsx
-│     ├─ chart.tsx
-│     ├─ checkbox.tsx
-│     ├─ collapsible.tsx
-│     ├─ command.tsx
-│     ├─ context-menu.tsx
-│     ├─ dialog.tsx
-│     ├─ drawer.tsx
-│     ├─ dropdown-menu.tsx
-│     ├─ empty.tsx
-│     ├─ field.tsx
-│     ├─ form.tsx
-│     ├─ hover-card.tsx
-│     ├─ input-group.tsx
-│     ├─ input-otp.tsx
-│     ├─ input.tsx
-│     ├─ item.tsx
-│     ├─ kbd.tsx
-│     ├─ label.tsx
-│     ├─ menubar.tsx
-│     ├─ navigation-menu.tsx
-│     ├─ pagination.tsx
-│     ├─ popover.tsx
-│     ├─ progress.tsx
-│     ├─ radio-group.tsx
-│     ├─ resizable.tsx
-│     ├─ scroll-area.tsx
-│     ├─ select.tsx
-│     ├─ separator.tsx
-│     ├─ sheet.tsx
-│     ├─ sidebar.tsx
-│     ├─ skeleton.tsx
-│     ├─ slider.tsx
-│     ├─ sonner.tsx
-│     ├─ spinner.tsx
-│     ├─ switch.tsx
-│     ├─ table.tsx
-│     ├─ tabs.tsx
-│     ├─ textarea.tsx
-│     ├─ toast.tsx
-│     ├─ toaster.tsx
-│     ├─ toggle-group.tsx
-│     ├─ toggle.tsx
-│     ├─ tooltip.tsx
-│     ├─ use-mobile.tsx
-│     └─ use-toast.ts
-├─ components.json
-├─ hooks
-│  ├─ use-mobile.ts
-│  └─ use-toast.ts
-├─ lib
-│  └─ utils.ts
-├─ next.config.mjs
-├─ package.json
-├─ pnpm-lock.yaml
-├─ portfolio-dashboard.zip
-├─ postcss.config.mjs
-├─ public
-│  ├─ apple-icon.png
-│  ├─ icon-dark-32x32.png
-│  ├─ icon-light-32x32.png
-│  ├─ icon.svg
-│  ├─ placeholder-logo.png
-│  ├─ placeholder-logo.svg
-│  ├─ placeholder-user.jpg
-│  ├─ placeholder.jpg
-│  └─ placeholder.svg
-├─ README.md
-├─ styles
-│  └─ globals.css
-└─ tsconfig.json
+## Desarrollo
 
-```
-```
-CV
-├─ app
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  └─ page.tsx
-├─ components
-│  ├─ theme-provider.tsx
-│  └─ ui
-│     ├─ accordion.tsx
-│     ├─ alert-dialog.tsx
-│     ├─ alert.tsx
-│     ├─ aspect-ratio.tsx
-│     ├─ avatar.tsx
-│     ├─ badge.tsx
-│     ├─ breadcrumb.tsx
-│     ├─ button-group.tsx
-│     ├─ button.tsx
-│     ├─ calendar.tsx
-│     ├─ card.tsx
-│     ├─ carousel.tsx
-│     ├─ chart.tsx
-│     ├─ checkbox.tsx
-│     ├─ collapsible.tsx
-│     ├─ command.tsx
-│     ├─ context-menu.tsx
-│     ├─ dialog.tsx
-│     ├─ drawer.tsx
-│     ├─ dropdown-menu.tsx
-│     ├─ empty.tsx
-│     ├─ field.tsx
-│     ├─ form.tsx
-│     ├─ hover-card.tsx
-│     ├─ input-group.tsx
-│     ├─ input-otp.tsx
-│     ├─ input.tsx
-│     ├─ item.tsx
-│     ├─ kbd.tsx
-│     ├─ label.tsx
-│     ├─ menubar.tsx
-│     ├─ navigation-menu.tsx
-│     ├─ pagination.tsx
-│     ├─ popover.tsx
-│     ├─ progress.tsx
-│     ├─ radio-group.tsx
-│     ├─ resizable.tsx
-│     ├─ scroll-area.tsx
-│     ├─ select.tsx
-│     ├─ separator.tsx
-│     ├─ sheet.tsx
-│     ├─ sidebar.tsx
-│     ├─ skeleton.tsx
-│     ├─ slider.tsx
-│     ├─ sonner.tsx
-│     ├─ spinner.tsx
-│     ├─ switch.tsx
-│     ├─ table.tsx
-│     ├─ tabs.tsx
-│     ├─ textarea.tsx
-│     ├─ toast.tsx
-│     ├─ toaster.tsx
-│     ├─ toggle-group.tsx
-│     ├─ toggle.tsx
-│     ├─ tooltip.tsx
-│     ├─ use-mobile.tsx
-│     └─ use-toast.ts
-├─ components.json
-├─ hooks
-│  ├─ use-mobile.ts
-│  └─ use-toast.ts
-├─ lib
-│  └─ utils.ts
-├─ next.config.mjs
-├─ package.json
-├─ pnpm-lock.yaml
-├─ portfolio-dashboard.zip
-├─ postcss.config.mjs
-├─ public
-│  ├─ apple-icon.png
-│  ├─ docs
-│  │  ├─ Certificado de LinkedIn Learning.pdf
-│  │  ├─ Certificado de LinkedIn Learning_presupuestos.pdf
-│  │  ├─ CertificadoDeFinalizacion_Aprende Gemini la IA de Google.pdf
-│  │  ├─ CertificadoDeFinalizacion_C esencial.pdf
-│  │  ├─ CertificadoDeFinalizacion_Explora una carrera en gestion de proyectos.pdf
-│  │  ├─ CertificadoDeFinalizacion_Fundamentos de ITIL Introduccion a la gestion de sistemas de informacion.pdf
-│  │  ├─ CertificadoDeFinalizacion_Fundamentos de ITIL La mejora de servicios.pdf
-│  │  ├─ CertificadoDeFinalizacion_Fundamentos de la gestion de proyectos Comunicacion-PMI.pdf
-│  │  ├─ CertificadoDeFinalizacion_Fundamentos de la gestion de proyectos Comunicacion.pdf
-│  │  ├─ CertificadoDeFinalizacion_Gestion de proyectos con Microsoft 365 (1).pdf
-│  │  ├─ CertificadoDeFinalizacion_Gestion de proyectos con Microsoft 365.pdf
-│  │  ├─ CertificadoDeFinalizacion_Introduccion a Microsoft Power Platform.pdf
-│  │  ├─ CertificadoDeFinalizacion_Optimiza tu trabajo con Microsoft 365.pdf
-│  │  ├─ CertificadoDeFinalizacion_Recursos humanos estrategicos.pdf
-│  │  ├─ CertificadoDeFinalizacion_Scrum avanzado - PMI.pdf
-│  │  ├─ CertificadoDeFinalizacion_Scrum avanzado.pdf
-│  │  ├─ CertificadoDeFinalizacion_Scrum esencial .pdf
-│  │  ├─ Mejora tu productividad - PMI.pdf
-│  │  ├─ Project Management Institute (PMI)®.pdf
-│  │  └─ UC-f69e1396-9b08-4b88-814d-1be6b28c2a89.pdf
-│  ├─ foto.png
-│  ├─ icon-dark-32x32.png
-│  ├─ icon-light-32x32.png
-│  ├─ icon.svg
-│  ├─ placeholder-logo.png
-│  ├─ placeholder-logo.svg
-│  ├─ placeholder-user.jpg
-│  ├─ placeholder.jpg
-│  └─ placeholder.svg
-├─ README.md
-├─ styles
-│  └─ globals.css
-└─ tsconfig.json
+Requiere Node y pnpm.
 
+```bash
+pnpm install
+pnpm dev      # http://localhost:3000
+pnpm build    # genera la exportación estática en out/
 ```
+
+En desarrollo el sitio se sirve en la raíz. En producción se aplica el `basePath` `/CV_Personal`, por lo que las rutas escritas a mano deben pasar por `withBase()` de `lib/base-path.ts`.
+
+## Despliegue
+
+El sitio se publica en GitHub Pages desde la rama `gh-pages`:
+
+```bash
+pnpm run deploy
+```
+
+El script compila el proyecto y sube la carpeta `out/`. Se usa `pnpm run deploy` porque `pnpm deploy` es otro comando de pnpm.
+
+## Agregar un certificado
+
+1. Copiar el PDF a `public/docs/`.
+2. Guardar la primera página como JPG de unos 720 px de ancho en `public/thumbs/`, con el mismo nombre del PDF.
+3. Agregar la entrada en `certificatesData`, dentro de `app/data/portfolio-data.tsx`. La categoría y el color se deducen del nombre en `getCertCategory`.
+
+## Autor
+
+Francisco Mireles Rodríguez — [LinkedIn](https://www.linkedin.com/in/mireles-rodriguez-francisco-47475b272/) · [GitHub](https://github.com/franciscoMR22)

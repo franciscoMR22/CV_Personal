@@ -31,7 +31,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="light"
           enableSystem
-          /* Se eliminó disableTransitionOnChange para permitir que el CSS global maneje el fade de 0.5s */
+          disableTransitionOnChange={false}
         >
           {children}
         </ThemeProvider>
