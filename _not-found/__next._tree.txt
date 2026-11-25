@@ -1,5 +1,5 @@
-:HL["/CV_Personal/_next/static/chunks/3j3rm0edoo4h8.css","style"]
-:HL["/CV_Personal/_next/static/chunks/3co8404bzq-_y.css","style"]
+:HL["/CV_Personal/_next/static/chunks/2wt-0fhbl5t2l.css","style"]
+:HL["/CV_Personal/_next/static/chunks/3dxdnid3c2jq6.css","style"]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"/_not-found","h":96,"c":"$Q2"}]]
-0:{"b":"NOy-edFsDtlEBQS8rtQhH","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"o8ooLdchabREQ9JkAnsBj","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
