@@ -9,7 +9,7 @@ Portafolio profesional de una sola página, enfocado en gestión de proyectos y 
 - **Inicio:** presentación con el avatar armado a partir de partículas y fondo animado que cambia con el tema.
 - **Experiencia:** recorrido con zoom, una escena por gesto de scroll. La experiencia laboral y la formación académica van en grupos separados, y cada puesto tiene un detalle desplegable con sus logros.
 - **Certificados:** carrusel 3D con 33 certificados. Cada tarjeta toma el color de su categoría y se abre en un visor de PDF dentro de la página. Incluye buscador.
-- **Proyectos:** OMS Corporativo, Home Lab Linux y NetStack (OSI × TCP/IP). Cada uno abre un diagrama isométrico de su arquitectura; al hacer clic en una capa se muestra su detalle.
+- **Proyectos:** OMS Corporativo, Home Lab Linux, NetStack (OSI × TCP/IP), Ajedrez 3D y un sistema institucional en Oracle APEX. Cada uno abre un diagrama isométrico de su arquitectura; al hacer clic en una capa se muestra su detalle.
 - **Navegación y tema:** barra flotante translúcida, tema claro y oscuro, y recorrido por teclado y rueda del ratón.
 
 ## Tecnologías

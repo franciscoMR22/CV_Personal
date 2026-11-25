@@ -5,7 +5,7 @@
     Created by: Francisco Mireles Rodriguez
 
 */
-import { Code2, Terminal, Database, Server, Cpu, Briefcase, Smartphone, Network, Container, Globe, ShieldCheck, HardDrive, LayoutDashboard, Activity, Library, Rocket } from 'lucide-react'
+import { Code2, Terminal, Database, Server, Cpu, Briefcase, Smartphone, Network, Container, Globe, ShieldCheck, HardDrive, LayoutDashboard, Activity, Library, Rocket, Boxes, Cog, Shapes, Layers, Crown } from 'lucide-react'
 
 //*Inicio************************Arreglo de experiencia (Roadmap)************************
 export const experienceData = [
@@ -112,7 +112,7 @@ export const certThumb = (file: string) => file.replace(/^\/docs\//, '/thumbs/')
 
 export const projectsData = [
   { id: 1,
-    title: "OMS Corporativo",
+    title: "OMS Corporativo", short: "OMS", icon: <Server />,
     category: "Arquitectura & Gestión",
     description: "Sistema centralizado de gestión de pedidos retail con orquestación por capas.",
     metrics: { left: "Equipo: 5 personas", right: "Tiempo: 3 meses" }, featured: true, accent: "#10B981",
@@ -138,7 +138,7 @@ export const projectsData = [
           summary: "Un solo docker-compose levanta las dependencias del sistema.",
           points: ["SQL Server 2022 y RabbitMQ con su panel de administración, con reinicio automático.", "Los servicios .NET y el frontend se ejecutan aparte durante el desarrollo."] } } ] },
   { id: 2,
-    title: "Home Lab Linux",
+    title: "Home Lab Linux", short: "Home Lab", icon: <Terminal />,
     category: "Infraestructura",
     description: "Servidor local securizado Ubuntu Server con despliegue de microservicios.",
     metrics: { left: "OS: Ubuntu", right: "Status: LAB" }, featured: false, accent: "#3B82F6",
@@ -164,7 +164,7 @@ export const projectsData = [
           summary: "Equipo modesto aprovechado con almacenamiento segmentado y respaldos automáticos.",
           points: ["LVM en el SSD: 110 GB para el sistema, tres volúmenes de 40 GB para los sistemas de desarrollo y unos 220 GB libres para crecer.", "Respaldo diario a las 03:00 con rsync hacia el disco Seagate, con un RPO de 24 horas.", "Backups y datos fríos van al HDD para reducir el desgaste del SSD."] } } ] },
   { id: 3,
-    title: "NetStack OSI × TCP/IP",
+    title: "NetStack OSI × TCP/IP", short: "NetStack", icon: <Network />,
     category: "Redes & Educación",
     description: "Comparación interactiva entre el modelo OSI y TCP/IP, con simulador de encapsulamiento, catálogo de más de 100 protocolos y modo práctica.",
     metrics: { left: "Catálogo: +100 protocolos", right: "Estado: en línea" }, featured: false, accent: "#D08A4E",
@@ -189,5 +189,57 @@ export const projectsData = [
       { label: "Despliegue", detail: "Exportación estática en GitHub Pages con Actions", icon: <Rocket />,
         info: { stack: "GitHub Pages · GitHub Actions · exportación estática",
           summary: "Sitio estático publicado de forma automática.",
-          points: ["Cada push a main reconstruye y republica el sitio.", "En desarrollo se sirve en la raíz; el basePath solo se activa dentro del workflow de despliegue."] } } ] }
+          points: ["Cada push a main reconstruye y republica el sitio.", "En desarrollo se sirve en la raíz; el basePath solo se activa dentro del workflow de despliegue."] } } ] },
+  { id: 4,
+    title: "Ajedrez 3D", short: "Ajedrez 3D", icon: <Crown />,
+    category: "Juegos & 3D",
+    description: "Ajedrez con tablero 2D y 3D, motor de reglas propio y piezas de mármol modeladas en OpenSCAD.",
+    metrics: { left: "Pruebas: +30 con Vitest", right: "Estado: en desarrollo" }, featured: false, accent: "#A78BFA",
+    layers: [
+      { label: "Interfaz 2D y 3D", detail: "React · TypeScript · Vite, con tablero en DOM y en WebGL", icon: <LayoutDashboard />,
+        info: { stack: "React 19 · TypeScript · Vite · CSS con unidades de contenedor",
+          summary: "Pantalla completa con barra superior, historial, columnas de capturadas y un tablero que crece hasta llenar el espacio libre.",
+          points: ["Vista 2D en el DOM y vista 3D con carga diferida: three queda en chunks aparte y no pesa en la carga inicial.", "Historial de jugadas con desplazamiento automático y leyenda temporal sobre el tablero para enroque, captura, promoción y jaque.", "Ventana de adicionales con los mods de apariencia y un visor para inspeccionar cada pieza."] } },
+      { label: "Escena 3D", detail: "react-three-fiber y three.js: piezas arrastrables, mods y estudio de luces", icon: <Boxes />,
+        info: { stack: "three.js · react-three-fiber · drei · shaders con onBeforeCompile",
+          summary: "El tablero 3D tiene dos modos: ver, para girar la cámara, y jugar, con la cámara fija y las piezas clicables o arrastrables.",
+          points: ["El arrastre usa raycast contra el plano del tablero y convierte la posición en casilla.", "Un mod cambia solo la apariencia (colores, estilo de tablero y de piezas, luces y fondo) y lo que no define lo hereda del clásico.", "El mármol se proyecta en triplanar con un shader, el cuero recibe UV generadas al cargar y las normales se recalculan.", "Iluminación de estudio de tres puntos con entorno de reflejos."] } },
+      { label: "Estado de la partida", detail: "zustand con persistencia: la partida es la lista de jugadas", icon: <Layers />,
+        info: { stack: "zustand · persist · localStorage",
+          summary: "La fuente de verdad no es un objeto de partida sino la lista de jugadas; cada acción reconstruye la partida a partir de ella.",
+          points: ["Solo se persisten las jugadas, la vista y el mod; la selección, la promoción pendiente y la leyenda son efímeras.", "Deshacer es quitar la última jugada de la lista.", "El estado se versiona y migra: al cambiar el formato se descarta el guardado anterior en lugar de romper la partida."] } },
+      { label: "Motor de reglas", detail: "Motor propio sin dependencias, con reglas de casa y seguimiento de piezas", icon: <Cog />,
+        info: { stack: "TypeScript puro · Vitest · +30 pruebas",
+          summary: "Motor escrito desde cero, sin React y sin librerías de ajedrez, con una variante de reglas definida por mí.",
+          points: ["El jaque solo avisa y no restringe jugadas; la partida termina al capturar al rey.", "Enroque con una única restricción de ataque: la casilla que cruza el rey no puede estar atacada.", "Tablas por material insuficiente, regla de 50 movimientos, triple repetición y falta de jugadas.", "Un seguimiento de piezas reproduce el historial y da un id estable a cada una, lo que permite animar movimientos, enroque, captura al paso y promoción."] } },
+      { label: "Modelado en OpenSCAD", detail: "Piezas en modelado continuo con OpenSCAD, exportadas a STL", icon: <Shapes />,
+        info: { stack: "OpenSCAD · STL · meshoptimizer · STLLoader",
+          summary: "Los modelos 3D de las piezas se están diseñando de forma paramétrica en OpenSCAD, en versiones de mármol y de cuero, y se siguen refinando.",
+          points: ["Un script de OpenSCAD por pieza; los modelos se exportan a STL y alimentan directamente el tablero 3D.", "Seis modelos compartidos por ambos colores, exportados en milímetros con la base en el origen.", "Reducción de malla con error relativo de 0.0004: el tablero inicial pasó de unos 3.3 millones de triángulos a cerca de 1 millón sin pérdida visible al acercar la cámara.", "Los doce archivos se precargan juntos y las geometrías se comparten entre piezas."] } } ] },
+  { id: 5,
+    title: "Sistema Institucional en Oracle APEX", short: "Oracle APEX", icon: <Database />,
+    category: "Gestión documental & Low-Code",
+    description: "Plataforma web que digitaliza un trámite administrativo con revisión y firma por etapas, accesos por rol y trazabilidad.",
+    metrics: { left: "Plataforma: Oracle APEX", right: "Rol: Backend" }, featured: false, accent: "#F43F5E",
+    layers: [
+      { label: "Interfaz web", detail: "Páginas responsivas de Oracle APEX, con vistas distintas por perfil", icon: <LayoutDashboard />,
+        info: { stack: "Oracle APEX · HTML5 · CSS · JavaScript",
+          summary: "Aplicación web accesible desde escritorio y dispositivos móviles, con una vista de trabajo adaptada a cada tipo de usuario.",
+          points: ["Formularios para cargar, consultar y reemplazar documentos.", "Vista dividida para revisar documentos y registrar observaciones.", "Avisos y notificaciones internas que acompañan el avance de cada trámite."] } },
+      { label: "Flujo y roles", detail: "Control de acceso por perfiles y revisión por etapas con firma electrónica", icon: <ShieldCheck />,
+        info: { stack: "RBAC · esquemas de autorización de APEX · firma electrónica",
+          summary: "Cada usuario ve y hace solo lo que le corresponde, y el trámite avanza por etapas formales de revisión.",
+          points: ["Permisos por perfil verificados en cada página y funcionalidad.", "Estados claros del trámite y devolución para corrección cuando algo no cumple.", "Historial de movimientos que permite saber quién intervino y cuándo."] } },
+      { label: "Lógica de negocio", detail: "Validaciones y reglas en la base de datos con PL/SQL", icon: <Cog />,
+        info: { stack: "PL/SQL · triggers · procedimientos almacenados",
+          summary: "Las reglas del proceso viven junto a los datos, de modo que se aplican igual sin importar desde dónde se capture la información.",
+          points: ["Validaciones automáticas al capturar y al cambiar de etapa.", "Restricciones sobre qué información se puede modificar según su estado.", "Mantenimiento centrado en revisar triggers y consultas."] } },
+      { label: "Datos", detail: "Modelo relacional en Oracle con integridad referencial", icon: <Database />,
+        info: { stack: "Oracle Database · SQL · modelo entidad-relación",
+          summary: "Repositorio central y estandarizado para sustituir el manejo disperso de documentos.",
+          points: ["Modelo entidad-relación con llaves primarias y foráneas.", "Los expedientes quedan asociados a su responsable y a su periodo.", "Respaldos programados y políticas de conservación de archivos."] } },
+      { label: "Gestión y entrega", detail: "Scrum con Jira, prototipos y documentación por rol", icon: <Rocket />,
+        info: { stack: "Scrum · Jira · prototipado de baja y alta fidelidad",
+          summary: "Desarrollo iterativo por sprints, con equipo dividido en frontend, backend y base de datos.",
+          points: ["Requerimientos levantados con los usuarios y modelados con historias y escenarios.", "Prototipos de baja y alta fidelidad antes de construir las pantallas.", "Entrega con documentación técnica y manuales según el perfil."] } } ] }
 ];

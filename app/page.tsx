@@ -10,7 +10,7 @@ import Script from 'next/script'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { 
-  Github, Linkedin, Instagram, MessageCircle, Twitter, Cpu, Search, ChevronLeft, ChevronRight, X, ChevronUp, ChevronDown, ExternalLink
+  Github, Linkedin, Instagram, MessageCircle, Twitter, Search, ChevronLeft, ChevronRight, X, ChevronUp, ChevronDown, ExternalLink
 } from 'lucide-react'
 
 import { certificatesData, projectsData } from '@/app/data/portfolio-data'
@@ -21,6 +21,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { LayerInfoPanel } from '@/components/layer-info-panel'
 import { useAvatarParticles } from '@/hooks/use-avatar-particles'
 import { ExperienceDeck } from '@/components/experience-deck'
+import { ProjectCard } from '@/components/project-card'
 import { withBase } from '@/lib/base-path'
 
 declare global { interface Window { particlesJS: any; } }
@@ -65,6 +66,7 @@ export default function FranciscoPortfolioV6() {
   }, [selectedProject, selectedLayer])
 
   const closeProject = useCallback(() => { setSelectedProject(null); setSelectedLayer(null); setPanelOpen(false) }, [])
+  const openProject = (proj: any) => { setSelectedProject(proj); setSelectedLayer(null); setPanelOpen(true) }
   const [activeSlide, setActiveSlide] = useState(0)
   const [direction, setDirection] = useState(0)
   const [isSliding, setIsSliding] = useState(false)
@@ -286,21 +288,11 @@ export default function FranciscoPortfolioV6() {
 
             {activeSlide === 3 && (
               <section className="min-h-screen w-full flex items-center py-28">
-                <div className="max-w-7xl mx-auto px-6 w-full space-y-12">
+                <div className="max-w-[90rem] mx-auto px-6 xl:px-20 w-full space-y-12">
                   <h2 className="text-4xl uppercase tracking-tighter text-center font-bold">Proyectos Destacados</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))] gap-4 auto-rows-[minmax(220px,auto)]" style={{ '--cols': projectsData.length } as React.CSSProperties}>
                     {projectsData.map((proj) => (
-                      <div key={proj.id} onClick={() => { setSelectedProject(proj); setSelectedLayer(null); setPanelOpen(true) }} className={`group cursor-pointer relative bg-glass backdrop-blur-xl border border-glass-border rounded-[32px] p-8 flex flex-col justify-between overflow-hidden transition-all duration-500 hover:scale-[1.02]`}>
-                        <div className="relative z-10">
-                          <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{proj.category}</p>
-                          <h3 className="font-bold leading-tight mb-4 text-2xl">{proj.title}</h3>
-                          <p className="opacity-70 text-sm max-w-md leading-relaxed font-normal">{proj.description}</p>
-                        </div>
-                        <div className="mt-8 flex items-end justify-between relative z-10">
-                          <div className="text-xs font-bold opacity-60"><p>{proj.metrics?.left}</p><p>{proj.metrics?.right}</p></div>
-                          <div className="flex items-center gap-3 text-primary"><span className="text-[10px] uppercase font-bold opacity-40">Arquitectura</span><Cpu size={22} /></div>
-                        </div>
-                      </div>
+                      <ProjectCard key={proj.id} project={proj} onOpen={() => openProject(proj)} />
                     ))}
                   </div>
                 </div>

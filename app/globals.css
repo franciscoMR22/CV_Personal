@@ -211,6 +211,46 @@ canvas.avatar-canvas {
 .project-link:hover { transform: scale(1.06); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 .project-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
+/* --- TARJETAS DE PROYECTOS ---
+   From Uiverse.io by Smit-Prajapati - https://uiverse.io/Smit-Prajapati/spicy-rat-83
+   MIT License, Copyright (c) Smit-Prajapati (Smit Prajapati)
+   Paleta: el acento de cada proyecto (--accent) sobre una superficie clara u oscura según el tema. */
+.pca { --pca-bg: color-mix(in srgb, var(--accent) 8%, #fff); --pca-fg: #0f172a; --pca-accent-text: color-mix(in srgb, var(--accent) 55%, #000); position: relative; width: 100%; height: 290px; display: grid; place-content: center; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--pca-bg); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); transition: all 0.25s ease-in-out; }
+.dark .pca { --pca-bg: color-mix(in srgb, var(--accent) 12%, #101417); --pca-fg: #e7edf0; --pca-accent-text: color-mix(in srgb, var(--accent) 72%, #fff); }
+.pca:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pca-border { position: absolute; inset: 0; border: 2px solid var(--accent); opacity: 0; transform: rotate(10deg); transition: all 0.25s ease-in-out; pointer-events: none; }
+.pca-info { position: absolute; top: 22px; left: 24px; right: 24px; text-align: left; }
+.pca-cat { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pca-accent-text); margin-bottom: 6px; }
+.pca-title { font-size: 15px; font-weight: 700; line-height: 1.25; color: var(--pca-fg); }
+.pca-metrics { margin-top: 6px; font-size: 10px; line-height: 1.4; color: var(--pca-fg); opacity: 0.65; }
+.pca-content { transition: all 0.25s ease-in-out; }
+.pca-logo { position: relative; width: 33px; height: 35px; overflow: hidden; transition: all 0.5s ease-in-out; }
+.pca-logo1 { position: absolute; left: 0; width: 33px; height: 33px; display: grid; place-items: center; color: var(--accent); }
+.pca-logo1 svg { width: 26px; height: 26px; }
+.pca-logo2 { position: absolute; left: 41px; height: 33px; line-height: 33px; font-size: 17px; font-weight: 800; white-space: nowrap; color: var(--pca-accent-text); }
+.pca-trail { position: absolute; right: 0; width: 100%; height: 100%; opacity: 0; }
+.pca-desc { position: absolute; left: 50%; top: 50%; width: 84%; margin-top: 68px; transform: translate(-50%, -50%); text-align: center; font-size: 11px; line-height: 1.45; color: var(--pca-fg); opacity: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; transition: all 0.25s ease-in-out 0.25s; }
+.pca-bottom { position: absolute; left: 50%; bottom: 13px; transform: translateX(-50%); padding: 0 5px 0 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; white-space: nowrap; letter-spacing: 7px; color: var(--pca-accent-text); background: var(--pca-bg); opacity: 0; transition: all 0.25s ease-in-out; }
+.pca:is(:hover, :focus-visible) { border-radius: 0; transform: scale(1.1); z-index: 5; }
+.pca:is(:hover, :focus-visible) .pca-logo { width: 150px; animation: pca-blink 0.5s ease-in-out; }
+.pca:is(:hover, :focus-visible) .pca-border { inset: 15px; opacity: 1; transform: rotate(0); }
+.pca:is(:hover, :focus-visible) .pca-bottom { letter-spacing: 3px; opacity: 1; }
+.pca:is(:hover, :focus-visible) .pca-desc { opacity: 0.85; }
+.pca:is(:hover, :focus-visible) .pca-trail { animation: pca-trail 0.5s ease-in-out; }
+@keyframes pca-blink { 0% { border-right: 1px solid transparent; } 10% { border-right: 1px solid var(--accent); } 80% { border-right: 1px solid var(--accent); } 100% { border-right: 1px solid transparent; } }
+@keyframes pca-trail {
+  0% { background: linear-gradient(90deg, transparent 90%, var(--accent) 100%); opacity: 0; }
+  30% { background: linear-gradient(90deg, transparent 70%, var(--accent) 100%); opacity: 1; }
+  70% { background: linear-gradient(90deg, transparent 70%, var(--accent) 100%); opacity: 1; }
+  95% { background: linear-gradient(90deg, transparent 90%, var(--accent) 100%); opacity: 0; }
+}
+
+/* Sin movimiento para quien lo pide en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  .pca, .pca * { transition-duration: 0.01ms !important; transition-delay: 0s !important; animation: none !important; }
+  .pca:is(:hover, :focus-visible) { transform: none; }
+}
+
 /* --- BUSCADOR Y SWITCH --- */
 .search-input { width: 100%; max-width: 400px; background: var(--glass); border: 1px solid var(--glass-border); padding: 10px 18px 10px 48px; border-radius: 999px; color: var(--foreground); outline: none; transition: all 0.3s ease; }
 
